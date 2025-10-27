@@ -90,3 +90,83 @@ Son embeddings vectoriales diseñados específicamente para capturar el signific
 Modelos como Word2Vec o GloVe generan vectores para palabras donde la distancia y dirección entre ellos codifican relaciones semánticas (ej. `vector('Rey') - vector('Hombre') + vector('Mujer') ≈ vector('Reina')`).  
 **Referencia:** Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). *Distributed representations of words and phrases and their compositionality.* *Advances in Neural Information Processing Systems, 26.*
 
+### **Modelos Transformers**
+La arquitectura **Transformer** revolucionó el PLN al introducir el mecanismo de **auto-atención (*self-attention*)**.  
+A diferencia de las arquitecturas recurrentes (RNN) que procesan el texto de manera secuencial, el mecanismo de atención permite al modelo **sopesar la importancia de todas las palabras en la secuencia de entrada de forma simultánea**, capturando dependencias complejas y de largo alcance entre términos, sin importar su distancia.  
+**Referencia Fundacional:** Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... & Polosukhin, I. (2017). *Attention is All You Need.* *Advances in Neural Information Processing Systems, 30.*
+
+
+### **Modelos Base (BERT, RoBERTa, DistilBERT, Robertuito)**
+A partir de la arquitectura Transformer, surgieron modelos de lenguaje **pre-entrenados de gran escala** que sirven como base para una multitud de tareas de PLN:
+
+- **BERT (Bidirectional Encoder Representations from Transformers):** Aprende representaciones de texto profundamente bidireccionales, considerando el contexto tanto a la izquierda como a la derecha de cada palabra de forma simultánea, lo que permite una comprensión contextual más rica.  
+- **RoBERTa (A Robustly Optimized BERT Pretraining Approach):** Es una variante que optimiza el proceso de preentrenamiento de BERT, utilizando más datos y ajustando los hiperparámetros de entrenamiento para mejorar significativamente su rendimiento.  
+- **DistilBERT:** Es una versión más pequeña y rápida de BERT, creada mediante un proceso llamado *destilación de conocimiento*, que conserva gran parte de la capacidad de BERT con un tamaño considerablemente menor.  
+- **Robertuito:** Es un modelo tipo RoBERTa **preentrenado desde cero sobre un corpus masivo en español**, lo que lo hace especialmente efectivo para tareas de PLN en este idioma.  
+
+
+### **Modelos Específicos Utilizados en esta Investigación**
+
+En la presente investigación, no se utilizaron los modelos base directamente, sino **versiones especializadas y previamente ajustadas (*fine-tuned*)** alojadas en la plataforma **Hugging Face**, seleccionadas por su alto rendimiento en tareas de análisis de emoción y sentimiento en inglés y español.
+
+
+#### **1. Extracción de Emociones en Inglés**
+- **Modelo:** `bhadresh-savani/distilbert-base-uncased-emotion`  
+- **Descripción:** Modelo basado en la arquitectura DistilBERT, ajustado para clasificar texto en seis emociones: *tristeza (sadness)*, *alegría (joy)*, *amor (love)*, *ira (anger)*, *miedo (fear)* y *sorpresa (surprise)*.  
+Su naturaleza ligera y eficiente fue ideal para procesar el gran corpus de canciones en inglés.  
+**Referencia:** Savani, B. (2021). *DistilBERT Base Uncased Emotion.* Hugging Face. [https://huggingface.co/bhadresh-savani/distilbert-base-uncased-emotion](https://huggingface.co/bhadresh-savani/distilbert-base-uncased-emotion)
+
+
+#### **2. Extracción de Emociones en Español**
+- **Modelo:** `pysentimiento/robertuito-emotion-analysis`  
+- **Descripción:** Modelo basado en la arquitectura Robertuito, optimizado para el español y ajustado para clasificar emociones en un corpus de redes sociales.  
+Detecta las emociones: *alegría (joy)*, *tristeza (sadness)*, *ira (anger)*, *sorpresa (surprise)*, *disgusto (disgust)* y *miedo (fear)*.  
+**Referencia:** Pérez, J. C., & Furman, D. (2021). *Robertuito Emotion Analysis.* Hugging Face. [https://huggingface.co/pysentimiento/robertuito-emotion-analysis](https://huggingface.co/pysentimiento/robertuito-emotion-analysis)
+
+
+#### **3. Cálculo de la Valencia Textual en Inglés**
+- **Modelo:** `cardiffnlp/twitter-roberta-base-sentiment-latest`  
+- **Descripción:** Modelo RoBERTa ajustado sobre un corpus masivo de tuits para análisis de sentimiento.  
+Proporciona probabilidades para las clases *positivo*, *negativo* y *neutro*, utilizadas para calcular una **métrica continua de valencia** mediante la fórmula *(p_pos - p_neg)*.  
+**Referencia:** Barbieri, F., et al. (2020). *Twitter RoBERTa Base for Sentiment Analysis - Latest.* Hugging Face. [https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest)
+
+
+#### **4. Cálculo de la Valencia Textual en Español**
+- **Modelo:** `pysentimiento/robertuito-sentiment-analysis`  
+- **Descripción:** Al igual que su contraparte de emociones, este modelo se basa en Robertuito y fue ajustado para la **clasificación de sentimiento (positivo, negativo, neutro)** en español.  
+Permite el cálculo de la valencia textual para el corpus de canciones en este idioma.  
+**Referencia:** Pérez, J. C., & Furman, D. (2021). *Robertuito Sentiment Analysis.* Hugging Face. [https://huggingface.co/pysentimiento/robertuito-sentiment-analysis](https://huggingface.co/pysentimiento/robertuito-sentiment-analysis)
+
+### **Modelos Pre-entrenados y Fine-tuning (Ajuste Fino)**
+Un **modelo pre-entrenado** es aquel que ha sido entrenado en una tarea a gran escala con una cantidad masiva de datos (por ejemplo, toda Wikipedia).  
+Este proceso le permite adquirir un **conocimiento general del lenguaje**, que luego puede reutilizarse en otras tareas.  
+El **fine-tuning** o **ajuste fino** consiste en tomar ese modelo pre-entrenado y **volver a entrenarlo** en un conjunto de datos más pequeño y específico de una tarea (por ejemplo, clasificar emociones en letras de canciones), adaptando su conocimiento general al problema concreto.  
+
+**Referencia:** Howard, J., & Ruder, S. (2018). *Universal Language Model Fine-tuning for Text Classification.* ArXiv preprint arXiv:1801.06146.
+
+
+### **Vectorización de Texto y Similaridad Semántica**
+La **vectorización** es el proceso de convertir texto en **representaciones numéricas (embeddings)** que pueden ser procesadas por algoritmos de aprendizaje automático.  
+La **similaridad semántica** mide cuán cercanas en significado son dos piezas de texto.  
+En el espacio vectorial, esto se evalúa comúnmente usando la **similitud del coseno**, una métrica que mide el ángulo entre dos vectores:  
+- Valor **1** indica vectores idénticos (significados muy similares).  
+- Valor **0** indica vectores ortogonales (sin relación semántica).  
+
+**Referencia:** Gomaa, W. H., & Fahmy, A. A. (2013). *A Survey of Text Similarity Approaches.* *International Journal of Computer Applications, 68*(13).
+
+
+### **Modelo de Lenguaje (Language Model)**
+Un **modelo de lenguaje** es un sistema estadístico o neuronal que aprende a **predecir la probabilidad de una secuencia de palabras**.  
+Los **modelos de lenguaje modernos a gran escala (LLMs)**, como **GPT-4**, son la base de las interfaces conversacionales actuales, ya que pueden **generar texto coherente, contextual y relevante** en respuesta a una entrada.  
+
+**Referencia:** Brown, T., et al. (2020). *Language Models Are Few-Shot Learners.* *Advances in Neural Information Processing Systems, 33,* 1877–1901.
+
+
+### **Prompt, Prompt Engineering y Contexto Conversacional**
+- **Prompt:** Es la entrada de texto que se proporciona a un modelo de lenguaje para que genere una respuesta.  
+- **Prompt Engineering:** Es la práctica de **diseñar, estructurar y refinar los prompts** para obtener respuestas más precisas, útiles o específicas del modelo.  
+- **Contexto Conversacional:** Es la **información adicional** (como el historial de mensajes previos) incluida en el prompt para que el modelo **mantenga coherencia y continuidad** en la conversación.  
+
+**Referencia:** White, J., Fu, Q., Hays, S., et al. (2023). *A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT.* ArXiv preprint arXiv:2302.11382.
+
+
