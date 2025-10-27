@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pandas
+numpy
+faiss-cpu
+spotipy
+langchain
+langchain-core
+langchain-openai
+openai
