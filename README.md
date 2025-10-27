@@ -22,20 +22,16 @@ El sistema combina **modelos preentrenados BERT** para la extracción de caracte
 
 ##  Contenido de los Anexos
 
-### **Anexo 1 – Preprocesamiento y Análisis Exploratorio (EDA)**
+### **Apéndice 1 – Preprocesamiento y Análisis Exploratorio (EDA)**
 Incluye los cuadernos utilizados para la limpieza de datos, normalización lingüística, detección de idioma, tokenización y análisis exploratorio de la base de datos musical.  
 Se describen las principales variables, distribuciones y correlaciones que fundamentan el diseño del recomendador.
 
-### **Anexo 2 – Chatbot: Backend y Frontend**
+### **Apéndice 2 – Chatbot: Backend y Frontend**
 Contiene la implementación modular del sistema conversacional.  
 Incluye la lógica de flujos, integración con el modelo GPT, generación de prompts y la interfaz de usuario.  
 La arquitectura se basa en una estructura de orquestación que conecta el procesamiento emocional, el motor FAISS y la capa de interacción.
 
-### **Anexo 3 – Dependencias, Librerías y APIs**
-Documenta las librerías, entornos y credenciales utilizadas (sin exponer claves privadas).  
-Incluye las descripciones técnicas de las APIs externas (Spotify, Hugging Face, etc.).
-
-### **Anexo 4 – Glosario y Conceptos Técnicos**
+### **Apéndice 3 – Glosario y Conceptos Técnicos**
 Reúne explicaciones breves de los principales términos utilizados en la tesis: embeddings, valencia emocional, FAISS, BERT, vector ponderado, entre otros.  
 También se incluyen referencias cruzadas con el documento principal.
 
