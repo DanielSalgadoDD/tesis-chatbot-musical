@@ -31,4 +31,3 @@ ESTRUCTURA JSON DE SALIDA:
     }},
     "respuesta_conversacional": "..." | null
 }}
-
