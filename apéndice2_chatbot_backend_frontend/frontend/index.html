@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recomendador Musical</title>
+    <title>Recomendador Musical Inteligente</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ===== Colores y tema ===== */
         :root {
-            --bg-color: #0B1D25; /* Azul nocturno profundo */
-            --surface-color: #142B34; /* Tarjetas ligeramente más claras */
-            --primary-color: #1ED9A6; /* Aguamarina brillante */
+            --bg-color: #0B1D25;
+            --surface-color: #142B34;
+            --primary-color: #1ED9A6;
             --primary-color-hover: #14B88F;
-            --secondary-color: #FF6B6B; /* Para botón Ir a Spotify */
-            --secondary-color-hover: #FF4C4C;
-            --text-color: #E0F7FA; /* Texto claro */
+            --secondary-color: #FF6B6B;
+            --text-color: #E0F7FA;
             --text-secondary-color: #B2DFDB;
             --user-bubble-color: #1ED9A6;
-            --bot-bubble-color: #142B34;
-            --border-color: #1A374D;
+            --bot-bubble-color: #1A374D;
+            --border-color: #2C4A52;
         }
 
         /* ===== Layout ===== */
@@ -39,30 +38,89 @@
 
         .chat-container {
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             height: 95vh;
             background-color: var(--surface-color);
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
-        .title-header {
-            text-align: center;
-            padding: 24px;
+        /* ===== Header & Settings ===== */
+        .header-group {
+            background-color: rgba(20, 43, 52, 0.95);
             border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
         }
 
         .title-header h1 {
             font-family: 'Lora', serif;
-            font-size: 2.4em;
+            font-size: 1.8em;
             margin: 0;
             color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(30, 217, 166, 0.2);
         }
 
+        /* --- Switch Toggle Estilo --- */
+        .settings-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: var(--text-secondary-color);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #37474F;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        /* ===== Chat Area ===== */
         #chatbox {
             flex-grow: 1;
             overflow-y: auto;
@@ -70,110 +128,181 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            scroll-behavior: smooth;
         }
 
-        #chatbox::-webkit-scrollbar { width: 8px; }
+        #chatbox::-webkit-scrollbar { width: 6px; }
         #chatbox::-webkit-scrollbar-track { background: transparent; }
-        #chatbox::-webkit-scrollbar-thumb { background-color: #1ED9A6; border-radius: 4px; }
+        #chatbox::-webkit-scrollbar-thumb { background-color: #2C4A52; border-radius: 3px; }
 
-        .message { max-width: 85%; padding: 12px 18px; border-radius: 20px; line-height: 1.6; word-wrap: break-word; transition: all 0.2s ease-in-out; }
-        .message.user { background-color: var(--user-bubble-color); color: #fff; border-bottom-right-radius: 5px; align-self: flex-end; }
-        .message.bot { background-color: var(--bot-bubble-color); color: var(--text-color); border-bottom-left-radius: 5px; align-self: flex-start; }
-
-        .input-area { display: flex; padding: 15px; border-top: 1px solid var(--border-color); }
-        #inputUsuario {
-            flex-grow: 1; padding: 12px 18px; font-size: 16px; border-radius: 25px;
-            border: 1px solid var(--border-color); background-color: #0B1D25; color: var(--text-color); outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            font-size: 0.95em;
+            position: relative;
+            animation: fadeIn 0.3s ease;
         }
-        #inputUsuario:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(30, 217, 166, 0.3); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .message.user {
+            background-color: var(--user-bubble-color);
+            color: #000;
+            font-weight: 500;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .message.bot {
+            background-color: var(--bot-bubble-color);
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ===== Input Area ===== */
+        .input-area {
+            display: flex;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            gap: 10px;
+        }
+
+        #inputUsuario {
+            flex-grow: 1;
+            padding: 14px 20px;
+            font-size: 16px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background-color: #09161D;
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #inputUsuario:focus { border-color: var(--primary-color); }
 
         #btnEnviar {
-            background: var(--primary-color); border: none; border-radius: 50%; width: 50px; height: 50px; margin-left: 10px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, transform 0.1s;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, background-color 0.2s;
+            flex-shrink: 0;
         }
-        #btnEnviar:hover { background-color: var(--primary-color-hover); }
+        #btnEnviar:hover { background-color: var(--primary-color-hover); transform: scale(1.05); }
         #btnEnviar:active { transform: scale(0.95); }
-        #btnEnviar svg { width: 24px; height: 24px; fill: white; }
+        #btnEnviar svg { width: 22px; height: 22px; fill: #0B1D25; transform: translateX(2px); }
 
-        /* ===== Tarjetas de recomendación ===== */
-        .recommendations-container { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        /* ===== Cards ===== */
+        .recommendations-container { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .recommendation-card {
-            background-color: #1A374D;
+            background-color: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
             padding: 12px;
             display: flex;
             align-items: flex-start;
             gap: 15px;
             border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-
-        .album-art { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-        
-        /* -- CORRECCIÓN DE ESTILO -- */
-        .card-content { flex: 1; display: flex; flex-direction: column; }
-        
-        .card-content h4 { margin: 0 0 5px 0; font-size: 1em; color: var(--primary-color); }
-        .card-content p { margin: 0; font-size: 0.9em; color: var(--text-secondary-color); }
-        .tags-container { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
-        .interactive-tag {
-            background-color: #1ED9A6;
-            color: #0B1D25;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
-            cursor: pointer;
             transition: background-color 0.2s;
         }
-        .interactive-tag:hover { background-color: #14B88F; }
+        .recommendation-card:hover { background-color: rgba(255, 255, 255, 0.03); }
+
+        .album-art { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        
+        .card-content { flex: 1; min-width: 0; }
+        .card-content h4 { margin: 0 0 4px 0; font-size: 1.05em; color: var(--primary-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-content p { margin: 0; font-size: 0.9em; color: var(--text-secondary-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .tags-container { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .interactive-tag {
+            background-color: rgba(30, 217, 166, 0.15);
+            color: var(--primary-color);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(30, 217, 166, 0.3);
+            transition: all 0.2s;
+        }
+        .interactive-tag:hover { background-color: var(--primary-color); color: #000; }
 
         .player-buttons { display: flex; gap: 8px; margin-top: 12px; }
-
         .play-button {
             background-color: var(--primary-color);
-            color: white;
+            color: #0B1D25;
             border: none;
-            border-radius: 8px;
-            padding: 6px 10px;
+            border-radius: 6px;
+            padding: 6px 12px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 4px;
-            transition: background-color 0.2s, transform 0.1s;
+            gap: 5px;
+            transition: opacity 0.2s;
         }
-        .play-button svg { width: 16px; height: 16px; fill: white; }
-        .play-button:hover { background-color: var(--primary-color-hover); transform: scale(1.05); }
-        
-        .player-container iframe { width: 100%; height: 80px; border-radius: 12px; margin-top: 10px; }
+        .play-button:hover { opacity: 0.9; }
+        .play-button svg { width: 14px; height: 14px; fill: currentColor; }
 
-        .suggestions-container { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .player-container iframe { width: 100%; height: 80px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border-color); }
+
+        /* ===== Suggestions ===== */
+        .suggestions-container { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
         .suggestion-button {
-            background-color: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);
-            padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600;
-            transition: background-color 0.2s, color 0.2s;
+            background: transparent;
+            color: var(--text-secondary-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
         }
-        .suggestion-button:hover { background-color: var(--primary-color); color: white; }
+        .suggestion-button:hover { border-color: var(--primary-color); color: var(--primary-color); background: rgba(30, 217, 166, 0.05); }
 
-        /* ===== Indicador de escritura ===== */
-        .typing-indicator { display: flex; align-items: center; padding: 12px 18px; }
-        .typing-indicator span { height: 8px; width: 8px; background-color: #1ED9A6; border-radius: 50%; display: inline-block; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
-        .typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+        /* ===== Typing Indicator ===== */
+        .typing-indicator { display: flex; align-items: center; padding: 15px 20px; gap: 4px; }
+        .typing-indicator span { height: 6px; width: 6px; background-color: var(--primary-color); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
 </head>
 <body>
+
     <div class="chat-container">
-        <div class="title-header">
-            <h1>Recomendador Musical</h1>
+        <!-- HEADER CON EL SWITCH DE MODO -->
+        <div class="header-group">
+            <div class="title-header">
+                <h1>Recomendador Musical</h1>
+            </div>
+            
+            <!-- AQUÍ ESTÁ EL NUEVO CONTROL DE MODO ESTRICTO -->
+            <div class="settings-bar">
+                <span>Descubrimiento</span>
+                <label class="switch">
+                    <input type="checkbox" id="modoEstrictoCheck">
+                    <span class="slider"></span>
+                </label>
+                <span style="color: var(--primary-color); font-weight: bold;">Similaridad Estricta</span>
+            </div>
         </div>
+
         <div id="chatbox"></div>
+
         <div class="input-area">
-            <input type="text" id="inputUsuario" placeholder="Pide una recomendación...">
+            <input type="text" id="inputUsuario" placeholder="Escribe una canción, artista o cómo te sientes..." autocomplete="off">
             <button id="btnEnviar">
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
@@ -184,6 +313,7 @@
         const chatbox = document.getElementById('chatbox');
         const inputUsuario = document.getElementById('inputUsuario');
         const btnEnviar = document.getElementById('btnEnviar');
+        const modoEstrictoCheck = document.getElementById('modoEstrictoCheck'); // Referencia al switch
         let activePlayerId = null;
 
         function handleInteractiveClick(event) {
@@ -200,22 +330,31 @@
             div.textContent = texto;
             chatbox.appendChild(div);
             inputUsuario.value = "";
-            chatbox.scrollTop = chatbox.scrollHeight;
+            scrollToBottom();
         }
 
         function agregarMensajeBot() {
             const botMessageContainer = document.createElement('div');
             botMessageContainer.className = 'message bot';
+            
             const textPart = document.createElement('div');
             botMessageContainer.appendChild(textPart);
+            
             const recsList = document.createElement('div');
             recsList.className = 'recommendations-container';
             botMessageContainer.appendChild(recsList);
+            
             const suggestionsContainer = document.createElement('div');
             suggestionsContainer.className = 'suggestions-container';
             botMessageContainer.appendChild(suggestionsContainer);
+            
             chatbox.appendChild(botMessageContainer);
+            scrollToBottom();
             return { textPart, recsList, suggestionsContainer };
+        }
+
+        function scrollToBottom() {
+            chatbox.scrollTop = chatbox.scrollHeight;
         }
 
         function togglePlayer(event) {
@@ -223,16 +362,18 @@
             const spotifyId = button.dataset.spotifyId;
             const playerId = button.dataset.playerId;
             const playerContainer = document.getElementById(playerId);
+
             if (activePlayerId === playerId && playerContainer.innerHTML !== '') {
-                playerContainer.innerHTML = ''; activePlayerId = null; return;
+                playerContainer.innerHTML = ''; 
+                activePlayerId = null; 
+                return;
             }
             if (activePlayerId && document.getElementById(activePlayerId)) {
                 document.getElementById(activePlayerId).innerHTML = '';
             }
+
             const iframe = document.createElement('iframe');
-            iframe.style.borderRadius = '12px';
-            iframe.src = `https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator`;
-            iframe.width = '100%'; iframe.height = '80'; iframe.frameBorder = '0';
+            iframe.src = `https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0`;
             iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
             playerContainer.appendChild(iframe);
             activePlayerId = playerId;
@@ -244,7 +385,7 @@
             div.className = 'message bot typing-indicator';
             div.innerHTML = `<span></span><span></span><span></span>`;
             chatbox.appendChild(div);
-            chatbox.scrollTop = chatbox.scrollHeight;
+            scrollToBottom();
         }
 
         function ocultarIndicadorDeEscritura() {
@@ -252,6 +393,7 @@
             if (indicador) indicador.remove();
         }
 
+        // ===== FUNCIÓN PRINCIPAL ACTUALIZADA =====
         async function enviarMensaje(texto) {
             const mensaje = texto || inputUsuario.value.trim();
             if (!mensaje) return;
@@ -259,8 +401,14 @@
 
             mostrarIndicadorDeEscritura();
 
+            // LEEMOS EL ESTADO DEL SWITCH (TRUE O FALSE)
+            const esModoEstricto = modoEstrictoCheck.checked;
+
             try {
-                const res = await fetch(`http://127.0.0.1:8000/chat?input_usuario=${encodeURIComponent(mensaje)}&session_id=user123`);
+                // AGREGAMOS EL PARÁMETRO &modo_estricto=... A LA URL
+                const url = `http://127.0.0.1:8000/chat?input_usuario=${encodeURIComponent(mensaje)}&session_id=user123&modo_estricto=${esModoEstricto}`;
+                
+                const res = await fetch(url);
                 ocultarIndicadorDeEscritura();
                 const { textPart, recsList, suggestionsContainer } = agregarMensajeBot();
                 
@@ -284,21 +432,21 @@
                                 const data = JSON.parse(dataJson);
                                 renderRecomendaciones(data.recomendaciones, recsList);
                                 renderSugerencias(data.sugerencias, suggestionsContainer);
-                            } catch (e) { console.error("Error parsing data block:", e, dataJson); }
+                            } catch (e) { console.error("Error data:", e); }
                         } else if (block.startsWith('text:')) {
                             const textChunkJson = block.substring(6);
                              try {
                                 const textChunk = JSON.parse(textChunkJson);
                                 textPart.innerHTML += markdown_simple_to_html(textChunk, true);
-                                chatbox.scrollTop = chatbox.scrollHeight;
-                            } catch (e) { console.error("Error parsing text chunk:", e, textChunkJson); }
+                                scrollToBottom();
+                            } catch (e) { console.error("Error text:", e); }
                         }
                     }
                 }
             } catch (err) {
                 ocultarIndicadorDeEscritura();
                 const { textPart } = agregarMensajeBot();
-                textPart.textContent = "Lo siento, hubo un error al comunicarse con el backend.";
+                textPart.textContent = "Error de conexión. Revisa que el backend esté corriendo.";
                 console.error(err);
             }
         }
@@ -312,7 +460,7 @@
                 card.className = 'recommendation-card';
 
                 const img = document.createElement('img');
-                img.src = rec.album_art_url || 'https://via.placeholder.com/64';
+                img.src = rec.album_art_url || 'https://via.placeholder.com/70';
                 img.className = 'album-art';
                 card.appendChild(img);
 
@@ -334,11 +482,10 @@
                     const tagEl = document.createElement('span');
                     tagEl.className = 'interactive-tag';
                     tagEl.textContent = rec.tag;
-                    tagEl.dataset.query = `recomiéndame canciones de género ${rec.tag}`;
+                    tagEl.dataset.query = `recomiéndame más de género ${rec.tag}`;
                     tagEl.addEventListener('click', handleInteractiveClick);
                     tagsContainer.appendChild(tagEl);
                 }
-
                 if (rec.emocion_label) {
                     const tagEl = document.createElement('span');
                     tagEl.className = 'interactive-tag';
@@ -347,10 +494,9 @@
                     tagEl.addEventListener('click', handleInteractiveClick);
                     tagsContainer.appendChild(tagEl);
                 }
-
                 contentDiv.appendChild(tagsContainer);
 
-                // --- Contenedor de player y botones ---
+                // Botones
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.className = 'player-buttons';
 
@@ -359,32 +505,28 @@
                 playerContainer.className = 'player-container';
                 
                 if (rec.spotify_id) {
-                    // Preview embebido
                     const playButton = document.createElement('button');
                     playButton.className = 'play-button';
-                    playButton.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-                    playButton.title = "Escuchar avance en Spotify";
+                    playButton.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Escuchar`;
                     playButton.dataset.spotifyId = rec.spotify_id;
                     playButton.dataset.playerId = playerContainer.id;
                     playButton.addEventListener('click', togglePlayer);
                     buttonsDiv.appendChild(playButton);
 
-                    // Ir a Spotify
                     const goSpotifyButton = document.createElement('button');
                     goSpotifyButton.className = 'play-button';
-                    goSpotifyButton.textContent = "Ir a Spotify";
-                    goSpotifyButton.title = "Abrir canción en Spotify";
+                    goSpotifyButton.style.backgroundColor = 'transparent'; 
+                    goSpotifyButton.style.border = '1px solid var(--primary-color)';
+                    goSpotifyButton.style.color = 'var(--primary-color)';
+                    goSpotifyButton.textContent = "Abrir App";
                     goSpotifyButton.addEventListener('click', () => {
                         window.open(`https://open.spotify.com/track/${rec.spotify_id}`, '_blank');
                     });
                     buttonsDiv.appendChild(goSpotifyButton);
                 }
 
-                // ===== LA CORRECCIÓN CLAVE ESTÁ AQUÍ =====
-                // Se añaden los botones y el reproductor al div de contenido, no a la tarjeta directamente.
                 contentDiv.appendChild(buttonsDiv); 
                 contentDiv.appendChild(playerContainer);
-
                 card.appendChild(contentDiv);
                 container.appendChild(card);
             });
@@ -397,7 +539,10 @@
                 const button = document.createElement('button');
                 button.className = 'suggestion-button';
                 button.textContent = sug;
-                let queryText = sug.toLowerCase().replace("más de", "recomiéndame más de género").replace("probar con", "recomiéndame género").replace("sentimiento:", "recomiéndame música para sentir");
+                let queryText = sug.toLowerCase()
+                    .replace("más de", "recomiéndame más de género")
+                    .replace("probar con", "recomiéndame género")
+                    .replace("sentimiento:", "recomiéndame música para sentir");
                 button.dataset.query = queryText.replace(/'/g, "");
                 button.addEventListener('click', handleInteractiveClick);
                 container.appendChild(button);
@@ -406,9 +551,7 @@
 
         function markdown_simple_to_html(text, isChunk = false) {
              let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-             if (!isChunk) {
-                html = html.replace(/\n/g, '<br>');
-             }
+             if (!isChunk) html = html.replace(/\n/g, '<br>');
              return html;
         }
         
@@ -419,7 +562,7 @@
         
         window.addEventListener('load', () => {
             const { textPart, suggestionsContainer } = agregarMensajeBot();
-            textPart.innerHTML = "¡Hola! Soy tu asistente musical. Dime cómo te sientes o pídeme canciones y te daré recomendaciones.";
+            textPart.innerHTML = "¡Hola! Soy tu asistente musical. 🎧<br>Usa el interruptor de arriba para elegir entre <b>Descubrimiento</b> (variado) o <b>Similaridad</b> (mismo estilo exacto).";
             renderSugerencias(["Sentimiento: 'alegría'", "Probar con 'rock'"], suggestionsContainer);
         });
     </script>
